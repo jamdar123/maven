@@ -1,0 +1,158 @@
+package Test_pakage;
+
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import junit.framework.Assert;
+import libraryPackage.UserMethods;
+
+public class ClearTrips extends UserMethods
+{
+static WebDriver driver;
+static String val1;	
+int i = 1;//required row number 
+ 
+@BeforeTest
+@Parameters("browser")
+public void initialize(String browser) throws IOException 
+{
+String URL  = "https://www.cleartrip.com/";
+driver = driverInstantiate(browser,URL);
+String ExcelLocation = "D:\\Auomation\\ClearTrip\\datafile\\cleartrips.xlsx";
+String ScreenshotLocation = "D:\\Auomation\\ClearTrip\\datafile\\cleartrips.xlsx" ;
+readFiles(ExcelLocation,ScreenshotLocation); 
+}
+@AfterMethod
+public void timing()
+{
+driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+//no need to mention time delay after each method, after every method implicit wait applies		  
+}
+@Test (priority = 1)
+public void radioButton() throws InterruptedException
+{
+List<WebElement> tr = driver.findElements(By.name("trip_type"));
+tr.get(1).click();
+}
+@Test (priority = 2)
+public void sourceCity() throws FileNotFoundException, IOException, InterruptedException
+{
+String fromPlace = readexcel(i,0);	
+String sourceCity = "FromTag";
+WebElement place = driver.findElement(By.id(sourceCity));
+place.clear();
+place.sendKeys(fromPlace);
+Thread.sleep(3000);
+place.sendKeys(Keys.ENTER);	
+Thread.sleep(5000);
+}
+@Test (priority = 3)
+public void destinationCity() throws FileNotFoundException, IOException, InterruptedException
+{
+String toPlace = readexcel(i,1);
+String destCity = "ToTag" ;
+WebElement place = driver.findElement(By.id(destCity));
+place.clear();
+place.sendKeys(toPlace);
+Thread.sleep(3000);
+place.sendKeys(Keys.ENTER);	
+Thread.sleep(5000);
+}
+@Test (priority = 4)
+public void departure() throws FileNotFoundException, IOException, InterruptedException {
+String depDay = readexcel(i,2);
+String depCalanderIcon = "//*[@id=\"ORtrip\"]/section[2]/div[1]/dl/dd/div/a/i";
+String depCalanderxpath = "//*[@id=\"ui-datepicker-div\"]/div[1]";
+String depCalMonthYearXpath ="//*[@id=\"ui-datepicker-div\"]/div[1]/div/div";
+String depnextXpath = "//*[@id=\"ui-datepicker-div\"]/div[2]/div/a";
+travelClearTrip.calanderclearTrip(driver,depDay,depCalanderIcon,depCalanderxpath,depCalMonthYearXpath, depnextXpath);
+Thread.sleep(5000);
+}
+@Test (priority = 5)
+public void returnDate() throws FileNotFoundException, IOException, InterruptedException 
+{
+String retDay =readexcel(i,3);
+String retCalanderIcon = "//*[@id=\"ReturnDateContainer\"]/dd/div/a/i";
+String retCalanderxpath = "//*[@id=\"ui-datepicker-div\"]/div[1]";
+String retCalMonthYearXpath = "//*[@id=\"ui-datepicker-div\"]/div[1]/div/div";
+String retnextXpath ="//*[@id=\"ui-datepicker-div\"]/div[2]/div/a";
+travelClearTrip.calanderclearTrip(driver,retDay,retCalanderIcon,retCalanderxpath,retCalMonthYearXpath,retnextXpath );
+Thread.sleep(5000);
+}
+@Test (priority = 6)
+public void adults() throws FileNotFoundException, IOException
+{
+	String adultNo =readexcel(i,4);
+	WebElement adult = driver.findElement(By.id("Adults"));
+	Select s = new Select(adult);
+	s.selectByVisibleText(adultNo);	
+}
+@Test (priority = 7)
+public void children() throws FileNotFoundException, IOException
+{
+	String childrenNo =readexcel(i,5);
+	WebElement children = driver.findElement(By.id("Childrens"));
+	Select s = new Select(children);
+	s.selectByVisibleText(childrenNo);	
+}
+@Test (priority = 8)
+public void infant() throws FileNotFoundException, IOException
+{
+	String infantNo =readexcel(i,6);
+	WebElement infant = driver.findElement(By.id("Infants"));
+	Select s = new Select(infant);
+	s.selectByVisibleText(infantNo);	
+}
+@Test (priority = 9)
+public void clickSubmit() throws InterruptedException, WebDriverException, IOException
+{
+WebElement submit = driver.findElement(By.id("SearchBtn"));
+submit.click();
+Thread.sleep(5000);
+screenShot(); 
+}
+@Test (priority = 10)
+public void asserting () throws IOException
+{
+	String expectedTitle = "Flight bookings, Cheap flights, Lowest Air tickets @Cleartrip";
+    String actualTitle = driver.getTitle();
+    System.out.println("actual title "+actualTitle);
+    Assert.assertEquals(actualTitle, expectedTitle); 
+}
+//checkbox__input o-0
+@Test (priority = 11)
+public void writeTo() throws IOException
+{
+	List<WebElement> listOfElements = driver.findElements(By.xpath("//*[@id=\"root\"]/div/main/div/div/div[2]/div[2]/div[12]/div[1]/div[1]/div//div[1]/div[2]/div[3]/div[2]/p"));
+	System.out.println("list entered and list size is "+listOfElements.size());	
+	String flightName = listOfElements.get(1).getText();
+	System.out.println("the second flight price is " +flightName);	
+	writeexcel(flightName,i,7);
+}
+@Test (priority = 12)
+public void checkBox() throws WebDriverException, IOException
+{
+	List<WebElement> checkBox = driver.findElements(By.xpath("//*[@id=\"root\"]/div/main/div/div/div[1]/div/aside/div[4]/div[3]/div[2]/div//div[1]/span"));
+	System.out.println("list entered and list size is "+checkBox.size());	
+	checkBox.get(1).click();
+	screenShot(); 
+}
+
+@AfterTest
+public void places() throws FileNotFoundException, IOException, InterruptedException 
+{
+	  driver.quit();

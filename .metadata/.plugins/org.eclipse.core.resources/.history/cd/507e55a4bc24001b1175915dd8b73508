@@ -1,0 +1,19 @@
+package com.cognizant.First_maven_project;
+
+import org.junit.Test;
+
+import junit.framework.TestCase;
+
+public class App_test{
+	
+	@Test
+	public void Test()
+	{
+		
+	}
+	
+	
+	
+	
+
+}

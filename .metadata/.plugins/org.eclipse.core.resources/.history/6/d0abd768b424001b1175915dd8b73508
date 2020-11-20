@@ -1,0 +1,7 @@
+package com.cognizant.First_maven_project;
+
+import junit.framework.TestCase;
+
+public class App_test extends TestCase {
+
+}
